@@ -303,3 +303,103 @@ Los estilos de programación que utilice en la implementacion que estuvo bajo mi
       }
       ```
       En la versión correcta, se utilizan comentarios para documentar el propósito de los getters y setters, lo que ayuda a otros desarrolladores a comprender cómo interactuar con la clase.
+
+### LABORATORIO 11 : Principios SOLID
+
+1. Single Responsibility Principle (SRP):
+   Este primer principio dice que “una clase debe tener una sola razón para cambiar”, es decir, debe tener una sola responsabilidad.
+   
+   a) Clase Votante: Lo que se hizo en primer lugar fue establecer la clase Votante. Esta clase se encarga únicamente de representar la entidad Votante y no debería contener lógica relacionada con la creación y actualización. A continuación se muestra la clase:
+   ```typescript
+   namespace Dominio.Votacion.entities {
+       class Votante extends Usuario {
+         private fechaNacimiento: string;
+         private genero: string;
+         private ocupacion: string;
+            
+         /**
+         * Constructor de la clase Votante
+         * @param nombre Nombre del votante
+         * @param correo Correo electrónico del votante
+         * @param rol
+         * @param dni
+         * @param fechaNacimiento Fecha de nacimiento del votante
+         * @param genero Género del votante
+         * @param ocupacion Ocupación del votante
+         */
+         constructor(
+              nombre: string,
+              correo: string,
+              rol: string,
+              dni: string,
+              fechaNacimiento: string = "",
+              genero: string = "",
+              ocupacion: string = ""
+         ) {
+              super(nombre, correo, rol, dni); // Llamada al constructor de la clase base Usuario
+              this.fechaNacimiento = fechaNacimiento;
+              this.genero = genero;
+              this.ocupacion = ocupacion;
+         }
+          
+         // Getter methods (funciones puras)
+         getfechaNacimiento(): string {
+            return this.fechaNacimiento;
+         }
+          
+         getGenero(): string {
+            return this.genero;
+         }
+          
+         getOcupacion(): string {
+           return this.ocupacion;
+         }
+      
+      }
+   }
+   ```
+   b) Servicio de Creación/Actualización de Votantes: Se creó un servicio separado para manejar la creación y actualización de los votantes. Esto ayuda a mantener la lógica relacionada con la base de datos y las operaciones de actualización en un lugar separado.
+   ```typescript
+   namespace Dominio.Votacion.service {
+   import Votante = Dominio.Votacion.entities.Votante;
+    export class VotanteService{
+        // Función para actualizar el atributo fechaNacimiento (estilo funcional)
+        cambiarFechaNacimiento(votante: Votante, fechaNacimiento: string): Votante {
+            return new Votante(
+              votante.getNombre(),
+              votante.getCorreo(),
+              votante.getRol(),
+              votante.getDni(),
+              fechaNacimiento,
+              votante.getGenero(),
+              votante.getOcupacion()
+            );
+        }
+        //Función para actualizar el atributo genero (estilo funcional)
+        cambiarGenero(votante: Votante, genero: string): Votante {
+            return new Votante(
+              votante.getNombre(),
+              votante.getCorreo(),
+              votante.getRol(),
+              votante.getDni(),
+              votante.getfechaNacimiento(),
+              genero,
+              votante.getOcupacion()
+            );
+        }
+        // Función para actualizar el atributo ocupacion (estilo funcional)
+        cambiarOcupacion(votante: Votante, ocupacion: string): Votante {
+            return new Votante(
+              votante.getNombre(),
+              votante.getCorreo(),
+              votante.getRol(),
+              votante.getDni(),
+              votante.getfechaNacimiento(),
+              votante.getGenero(),
+              ocupacion
+            );
+        }
+     }
+    
+   }
+   ```
