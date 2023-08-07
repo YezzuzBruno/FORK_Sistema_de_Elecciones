@@ -303,3 +303,213 @@ Los estilos de programación que utilice en la implementacion que estuvo bajo mi
       }
       ```
       En la versión correcta, se utilizan comentarios para documentar el propósito de los getters y setters, lo que ayuda a otros desarrolladores a comprender cómo interactuar con la clase.
+
+### LABORATORIO 11 : Principios SOLID
+
+1. Single Responsibility Principle (SRP):
+   Este primer principio dice que “una clase debe tener una sola razón para cambiar”, es decir, debe tener una sola responsabilidad.
+   
+   a) Clase Votante: Lo que se hizo en primer lugar fue establecer la clase Votante. Esta clase se encarga únicamente de representar la entidad Votante y no debería contener lógica relacionada con la creación y actualización. A continuación se muestra la clase:
+   ```typescript
+   namespace Dominio.Votacion.entities {
+       class Votante extends Usuario {
+         private fechaNacimiento: string;
+         private genero: string;
+         private ocupacion: string;
+            
+         /**
+         * Constructor de la clase Votante
+         * @param nombre Nombre del votante
+         * @param correo Correo electrónico del votante
+         * @param rol
+         * @param dni
+         * @param fechaNacimiento Fecha de nacimiento del votante
+         * @param genero Género del votante
+         * @param ocupacion Ocupación del votante
+         */
+         constructor(
+              nombre: string,
+              correo: string,
+              rol: string,
+              dni: string,
+              fechaNacimiento: string = "",
+              genero: string = "",
+              ocupacion: string = ""
+         ) {
+              super(nombre, correo, rol, dni); // Llamada al constructor de la clase base Usuario
+              this.fechaNacimiento = fechaNacimiento;
+              this.genero = genero;
+              this.ocupacion = ocupacion;
+         }
+          
+         // Getter methods (funciones puras)
+         getfechaNacimiento(): string {
+            return this.fechaNacimiento;
+         }
+          
+         getGenero(): string {
+            return this.genero;
+         }
+          
+         getOcupacion(): string {
+           return this.ocupacion;
+         }
+      
+      }
+   }
+   ```
+   b) Servicio de Creación/Actualización de Votantes: Se creó un servicio separado para manejar la creación y actualización de los votantes. Esto ayuda a mantener la lógica relacionada con la base de datos y las operaciones de actualización en un lugar separado.
+   ```typescript
+   namespace Dominio.Votacion.service {
+   import Votante = Dominio.Votacion.entities.Votante;
+    export class VotanteService{
+        // Función para actualizar el atributo fechaNacimiento (estilo funcional)
+        cambiarFechaNacimiento(votante: Votante, fechaNacimiento: string): Votante {
+            return new Votante(
+              votante.getNombre(),
+              votante.getCorreo(),
+              votante.getRol(),
+              votante.getDni(),
+              fechaNacimiento,
+              votante.getGenero(),
+              votante.getOcupacion()
+            );
+        }
+        //Función para actualizar el atributo genero (estilo funcional)
+        cambiarGenero(votante: Votante, genero: string): Votante {
+            return new Votante(
+              votante.getNombre(),
+              votante.getCorreo(),
+              votante.getRol(),
+              votante.getDni(),
+              votante.getfechaNacimiento(),
+              genero,
+              votante.getOcupacion()
+            );
+        }
+        // Función para actualizar el atributo ocupacion (estilo funcional)
+        cambiarOcupacion(votante: Votante, ocupacion: string): Votante {
+            return new Votante(
+              votante.getNombre(),
+              votante.getCorreo(),
+              votante.getRol(),
+              votante.getDni(),
+              votante.getfechaNacimiento(),
+              votante.getGenero(),
+              ocupacion
+            );
+        }
+     }
+    
+   }
+   ```
+
+
+2. Open/Closed Principle (OCP):
+   Este principio dice que "las entidades de software (clases, módulos, funciones, etc.) deben abrirse para una extensión, pero cerrarse para modificarse". 
+   
+   a) Clase Eleccion: Lo que se hizo fue diseñar la clase, de tal manera que sea abierta para extensiones pero cerrada para modificaciones. Esto significa que deberíamos poder agregar nuevas funcionalidades a la clase sin tener que modificar su código original. Una forma de lograr esto es a través del uso de patrones de diseño, como el patrón Strategy.
+   ```typescript
+    interface IEleccionStrategy {
+      calcularResultado(): string;
+    }
+
+    class Eleccion {
+      private _idEleccion: number = 0;
+      private _idVoto: number = 0;
+      private _nombre: string = "";
+      private _fecha: string = "";
+      private _estadoEleccion: string = "";
+      private _strategy: IEleccionStrategy; // Referencia a la estrategia
+  
+      constructor(strategy: IEleccionStrategy) {
+        this._strategy = strategy;
+      }
+  
+      // Resto de los métodos y propiedades de Eleccion
+      // Getter para la propiedad idEleccion
+      get idEleccion(): number {
+        return this._idEleccion;
+      }
+    
+      // Setter para la propiedad idEleccion
+      set idEleccion(value: number) {
+        this._idEleccion = value;
+      }
+    
+      // Getter para la propiedad idVoto
+      get idVoto(): number {
+        return this._idVoto;
+      }
+    
+      // Setter para la propiedad idVoto
+      set idVoto(value: number) {
+        this._idVoto = value;
+      }
+    
+      // Getter para la propiedad nombre
+      get nombre(): string {
+        return this._nombre;
+      }
+    
+      // Setter para la propiedad nombre
+      set nombre(value: string) {
+        this._nombre = value;
+      }
+    
+      // Getter para la propiedad fecha
+      get fecha(): string {
+        return this._fecha;
+      }
+    
+      // Setter para la propiedad fecha
+      set fecha(value: string) {
+        this._fecha = value;
+      }
+    
+      // Getter para la propiedad estadoEleccion
+      get estadoEleccion(): string {
+        return this._estadoEleccion;
+      }
+    
+      // Setter para la propiedad estadoEleccion
+      set estadoEleccion(value: string) {
+        this._estadoEleccion = value;
+      }
+  
+      // Método para calcular el resultado utilizando la estrategia
+      calcularResultado(): string {
+        return this._strategy.calcularResultado();
+      }
+    }
+    ```
+
+   b) Se desarrollo una interfaz IEleccionStrategy que define el método calcularResultado(). Luego, se creo dos estrategias concretas: EleccionPresidencialStrategy y EleccionParlamentariaStrategy (por ejemplo). La clase Eleccion ahora acepta una estrategia en su constructor y utiliza esa estrategia para calcular el resultado.
+   ```typescript
+    class EleccionPresidencialStrategy implements IEleccionStrategy {
+      calcularResultado(): string {
+        // Lógica específica para elecciones presidenciales
+        return "Resultado de elección presidencial";
+      }
+    }
+    ```
+
+   ```typescript
+    class EleccionParlamentariaStrategy implements IEleccionStrategy {
+     calcularResultado(): string {
+       // Lógica específica para elecciones parlamentarias
+       return "Resultado de elección parlamentaria";
+     }
+    }
+    ```
+
+    Este diseño sigue el Principio Abierto/Cerrado ya que se puede agregar nuevas estrategias (nuevos tipos de elecciones) sin modificar la clase Eleccion original. Esto permite extender el comportamiento de la clase de manera flexible y mantenible.
+  
+    ```typescript
+    // Uso
+    const eleccionPresidencial = new Eleccion(new EleccionPresidencialStrategy());
+    console.log(eleccionPresidencial.calcularResultado());
+  
+    const eleccionParlamentaria = new Eleccion(new EleccionParlamentariaStrategy());
+    console.log(eleccionParlamentaria.calcularResultado());
+    ```
