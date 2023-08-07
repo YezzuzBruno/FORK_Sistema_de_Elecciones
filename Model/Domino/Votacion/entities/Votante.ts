@@ -1,5 +1,5 @@
 namespace Dominio.Votacion.entities {
-  class Votante extends Usuario {
+  export class Votante extends Usuario {
     private fechaNacimiento: string;
     private genero: string;
     private ocupacion: string;
@@ -41,7 +41,7 @@ namespace Dominio.Votacion.entities {
     getOcupacion(): string {
       return this.ocupacion;
     }
-  
+  /*
     // Función para actualizar el atributo fechaNacimiento (estilo funcional)
     cambiarFechaNacimiento(fechaNacimiento: string): Votante {
       return Object.assign(new Votante(this.nombre, this.correo, this.rol, this.dni, fechaNacimiento, this.genero, this.ocupacion), this);
@@ -55,6 +55,6 @@ namespace Dominio.Votacion.entities {
     // Función para actualizar el atributo ocupacion (estilo funcional)
     cambiarOcupacion(ocupacion: string): Votante {
       return Object.assign(new Votante(this.nombre, this.correo, this.rol, this.dni, this.fechaNacimiento, this.genero, ocupacion), this);
-    }
+    }*/
   }
 }
